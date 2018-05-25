@@ -1,0 +1,32 @@
+apiVersion: v1 
+kind: Pod 
+metadata: 
+  name: busybox
+  namespace: default
+spec:
+  nodeSelector:
+    zone: k8s2
+  containers:
+  - name: busybox
+    image: registry.cn-hangzhou.aliyuncs.com/yanfulei/busybox:latest
+    volumeMounts:
+      - name: rbdpd
+        mountPath: /mnt/rbd
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+  restartPolicy: Always
+  volumes:
+    - name: rbdpd
+      rbd:
+        monitors:
+        - '172.16.170.130:6789'
+        - '172.16.170.131:6789'
+        - '172.16.170.132:6789'
+        pool: rbd
+        image: foo
+        fsType: ext4
+        readOnly: true
+        user: admin
+        keyring: /etc/ceph/ceph.client.admin.keyring
